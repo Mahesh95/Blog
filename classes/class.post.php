@@ -10,6 +10,7 @@ require_once('../include/config.php');
 		private $fileName;			//name of the image file
 		private $database;
 		private $fileLocation;
+		private $approved;
 
 		// this constructor when creating instances to write to database
 		public function __construct($postTitle, $postCont, $postDesc, $userId, $database){
@@ -20,14 +21,16 @@ require_once('../include/config.php');
 			$this->userId = $userId;
 			$this->fileName = "$userId"."$this->postTime()";
 			$this->database = $database;
+			$this->approved = 0;
 		}
 
 		// this function writes a Post to database
 		public static function writeToPostTable(Post $post){
+			echo "i was called";
 
 			try{
-				$statment = $post->getDatabase()->prepare('INSERT INTO posts (userId, postTitle, postCont, postDesc, postTime, fileName, fileLocation) VALUES (
-					:userId, :postTitle, :postCont, :postDesc, :postTime, :fileName, :fileLocation)' );
+				$statment = $post->getDatabase()->prepare('INSERT INTO posts (userId, postTitle, postCont, postDesc, postTime, fileName, fileLocation, approved) VALUES (
+					:userId, :postTitle, :postCont, :postDesc, :postTime, :fileName, :fileLocation, 0)' );
 
 				$statment->execute(array(
 					':userId' => $post->getUserId(),
@@ -81,6 +84,10 @@ require_once('../include/config.php');
 
 		public function getDatabase(){
 			return $this->database;
+		}
+
+		public function setApproved($isApproved){
+			$this->approved = $isApproved;
 		}
 	}
 ?>

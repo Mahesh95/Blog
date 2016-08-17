@@ -3,7 +3,8 @@
 require_once('../include/config.php');
 //if already logged in, then redirection from index page, destroy the session
 if( $user->isLoggedIn() ){
- session_destroy();
+ header("Location: ../index.php");
+ exit();
 }
 ?>
 

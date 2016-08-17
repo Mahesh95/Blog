@@ -6,8 +6,10 @@
 		if($_FILES['image']['name']){
 
 			// if no error
-			if(!$_FILES['image']['error']){
-
+			if($_FILES['image']['error']){
+				echo "error uploading image";
+				
+			}else{
 				// create an intance of post
 				$post = new Post($_POST['postTitle'], $_POST['postCont'], $_POST['postDesc'], $_SESSION['userId'], $database);
 			
@@ -22,7 +24,7 @@
 				$post->setFileLocation($targetFile);
 
 				//write post to the database
-				Post::writeToPostTable($post, $user);
+				Post::writeToPostTable($post);
 			}
 		}	
 	}
