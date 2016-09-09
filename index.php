@@ -7,8 +7,6 @@ require_once('include/config.php');
             echo "<li id = 'logout' class = 'navigation_element'><a href='index.php?logout=1'>Logout</a></li>";
             echo "<li class = 'navigation_element'><a href = 'admin/addPost.php'>New Post</a></li>";
             echo "<li class = 'navigation_element'><a href = 'index.php?myPosts=1'>My Posts</a></li>";
-            
-            //check if user is admin, if so let him access pending posts
             echo "<li class = 'navigation_element'><a href = 'index.php?pending_posts=1'>Pending</a></li>";
 
         }else{
@@ -23,22 +21,19 @@ require_once('include/config.php');
         header('Location: index.php');
     }
 
-    if(isset($_GET['pending_posts'])){
-
-    }
-
+    // funtion to search in posts
     function searchPosts($searchInput){
         $database = $GLOBALS['database'];
 
         try{
-            $statement = $database->prepare('SELECT postId, userId, postTitle, postCont, postDesc, postTime, fileName, fileLocation FROM posts WHERE approved = 1 AND postTitle LIKE %:searchInput% UNION SELECT postId, userId, postTitle, postCont, postDesc, postTime, fileName, fileLocation FROM posts WHERE approved = 1 AND postDesc LIKE %:searchInput% UNION SELECT postId, userId, postTitle, postCont, postDesc, postTime, fileName, fileLocation FROM posts WHERE approved = 1 AND postCont LIKE %:searchInput% 
-                ORDER BY postID DESC');
-            $statement->execute(array(':searchInput' => $searchInput));
+            $statement = $database->prepare('SELECT * FROM posts WHERE (approved = 1 AND postTitle LIKE :searchInput)
+            OR (approved = 1 AND postDesc LIKE :searchInput) OR (approved = 1 AND postCont LIKE :searchInput) ORDER BY postId DESC');
+            $statement->execute(array(":searchInput" => "%$searchInput%"));
 
             createPosts($statement);
 
         }catch(PDOException $error){
-            echo $error->getMessage;
+            echo $error->getMessage();
         }
     }
 
@@ -56,13 +51,14 @@ require_once('include/config.php');
 
                         // allow editing only if post written by user
                         if(isset($_SESSION['userId']) && $_SESSION['userId'] == $row['userId']){
-                            echo "<i class = 'material-icons edit'>mode_edit</i>";
+                            echo "<i class = 'material-icons edit'><a href = 'admin/addPost.php?postId=".$row['postId']."'>mode_edit</a></i>";
                         }
 
                         echo "<img  class = 'postImage' src ="."'$fileUrl'"." >";
 
                         //postId is hidden, will be handy for ajax
                         echo "<p class = 'postId'>".$row['postId']."</p>";
+
                         echo "<p class = 'post_desc'>".$row['postDesc']."</p>"; 
                         echo "<p class = 'post_cont'>".$row['postCont']."</p>";
                         echo '<p class = "post_time">Posted on '.date('jS M Y H:i:s', strtotime($row['postTime'])).'</p>';            
@@ -118,8 +114,10 @@ require_once('include/config.php');
     <div id = "navigation_bar">
         <div id = "navigation_bar_wrapper">
             <ul>
-                <input id = "search_bar" type="text" name="search" placeholder="search...">
-                <input type="submit" name="search_button" value="search!">
+                <form style = "display:inline;">
+                    <input id = "search_bar" type="text" name="search" placeholder="search...">
+                    <input type="submit" name="search_button" value="search!">
+                </form>
                 <li class = "navigation_element"><a href="index.php">Home</a></li>
 
                 <?php require_once('include/config.php');
@@ -151,6 +149,12 @@ require_once('include/config.php');
                 }
                 
             }
+
+            // for search query
+            else if(isset($_GET['search_button']) && isset($_GET['search'])){
+                searchPosts($_GET['search']);
+            }
+            // otherwise user is just viewer, let him see only approved posts
             else{
                 getPosts(0,1);
             }

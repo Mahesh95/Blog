@@ -12,6 +12,7 @@ if( $user->isLoggedIn() ){
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="../style/login.css">
   <title>Admin Login</title>
 </head>
 <body>
@@ -42,10 +43,10 @@ if( $user->isLoggedIn() ){
 	if(isset($message)){ echo $message; }
 	?>
 
-	<form action="" method="post">
-	<p><label>Username</label><input type="text" name="username" value=""  /></p>
-	<p><label>Password</label><input type="password" name="password" value=""  /></p>
-	<p><label></label><input type="submit" name="submit" value="Login"  /></p>
+	<form action="" method="post" id = "login_form">
+	<p class = "login_form_fields"><label>Username</label><input type="text" name="username" value=""  class = "inputField" /></p>
+	<p class = "login_form_fields"><label>Password</label><input type="password" name="password" value=""  class="inputField" /></p>
+	<input type="submit" name="submit" value="Login" id="login_button"/>
 	</form>
 
 </div>
