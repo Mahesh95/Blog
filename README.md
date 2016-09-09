@@ -1,4 +1,4 @@
 # Blog
 
-Simple blogging website
-part of college project
+Simple blogging website<br/>
+software tools project
